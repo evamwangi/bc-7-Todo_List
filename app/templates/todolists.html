@@ -3,9 +3,10 @@
 
 
 {% block page_content %}
-<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
-<script type="text/javascript" src="static/js/mine.js"></script>
-<link rel="stylesheet" href="static/css/style2.css" />
+<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>	
+<script type="text/javascript" src="{{ url_for('static', filename='js/move_item.js') }}"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style2.css') }}" />
 <div class="container">
     <div class="row">
         <div class="col-md-6">
