@@ -1,7 +1,9 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from flask.ext.login import UserMixin, AnonymousUserMixin
 from flask.ext.login import UserMixin
 from app import db, login_manager
+from datetime import datetime
 
 class User(UserMixin, db.Model):
 	__tablename__ = 'users'
@@ -11,6 +13,12 @@ class User(UserMixin, db.Model):
 	username = db.Column(db.String(64), unique=True, index=True)
 	email = db.Column(db.String(64), unique=True, index=True)
 	password_hash = db.Column(db.String(128))
+	role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+	name = db.Column(db.String(64))
+	location = db.Column(db.String(64))
+	about_me = db.Column(db.Text())
+	member_since = db.Column(db.DateTime(), default=datetime.utcnow)
+	last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
 
 	@property 
 	def password(self):
@@ -30,6 +38,23 @@ class User(UserMixin, db.Model):
 		'''
 		return check_password_hash(self.password_hash, password)
 
+	def __init__(self, **kwargs):
+		super(User, self).__init__(**kwargs)
+		if role is None:
+			self.role = Role.query.filter_by(default=True).first()
+
+	def can(self,permissions):
+		return self.role is not None and\
+			(self.role.permissions & permissions) == permissions
+
+class AnonymousUser(AnonymousUserMixin):
+	"""for unregistered user"""
+	def can(self, permissions):
+		return False
+# login_manager.anonymous_user = AnonymousUser
+		
+		
+
 	# def generate_confirmation_token(self, expiration=3600):
 	# 	s = Serializer(current_app.config['SECRET_KEY'], expiration)
 	# 	return s.dumps({'confirm': self.id})
@@ -46,7 +71,9 @@ class User(UserMixin, db.Model):
 	# 	self.confirm = True
 	# 	db.session.add(self)
 	# 	return True
-
+	def ping(self):
+		self.last_seen = datetime.utcnow()
+		db.session.add(self)
 
 	@login_manager.user_loader
 	def load_user(user_id):
@@ -56,4 +83,35 @@ class User(UserMixin, db.Model):
 		'''
 		return User.query.get(int(user_id))
 
+class  Role(db.Model):
+	"""creating roles for the users"""
+	__tablename__ = "roles"
+	id = db.Column(db.Integer, primary_key=True)
+	name = db.Column(db.String(64), unique=True)
+	default = db.Column(db.Boolean, default=False, index=True)
+	permissions = db.Column(db.Integer)
+	users = db.relationship('User', backref='role', lazy='dynamic')
+
+	@staticmethod
+	def insert_roles():
+		roles = {
+			'user': (Permission.FOLLOW|
+					Permission.WRITE_ARTICLES|
+					Permission.COMMENT, True)
+		}
+
+		for r in roles:
+			role = Role.query.filter_by(name=r).first()
+			if role is None:
+				role = Role(name=r)
+			role.Permissions = roles[r][0]
+			role.default = roles[r][1]
+			db.session.add(role)
+		db.session.commit()
+		
+
+class Permission:
+	FOLLOW = 0x01
+	COMMENT = 0x02
+	WRITE_ARTICLES = 0x04
 	

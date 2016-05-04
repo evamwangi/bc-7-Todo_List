@@ -3,6 +3,7 @@ from flask.ext.login import login_user, logout_user, login_required
 from . import auth
 from . forms import LogInForm, SignUpForm
 from ..models import User
+from flask.ext.login import current_user
 from app import db
 
 @auth.route('/login', methods=['GET', 'POST'])
@@ -54,3 +55,11 @@ def logout():
 	flash('You have been logged out.')
 	return redirect(url_for('main.index'))
 
+@auth.before_app_request
+def before_request():
+	if current_user.is_authenticated:
+		current_user.ping()
+		if not current_user.confirmed and request.endpoint[:5] != 'auth.':
+			return redirect(url_for('main.index'))
+			
+	

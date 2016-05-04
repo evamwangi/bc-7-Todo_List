@@ -12,3 +12,11 @@ def index():
 @main.route('/todo', methods=['GET', 'POST'])
 def todo():
 	return render_template('todolists.html')
+
+@main.route('/user/<username>')
+def user(username):
+	user = user.query.filter_by(username=username).first()
+	if user == None:
+		abort()
+
+	return render_template('user.html', user=user)
