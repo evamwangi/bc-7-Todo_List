@@ -9,5 +9,6 @@ def index():
 	#session.permanent = True
 	return render_template('index.html')
 
+@main.route('/todo', methods=['GET', 'POST'])
 def todo():
 	return render_template('todolists.html')
