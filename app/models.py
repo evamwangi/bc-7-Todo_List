@@ -20,6 +20,7 @@ class User(UserMixin, db.Model):
 	member_since = db.Column(db.DateTime(), default=datetime.utcnow)
 	last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
 
+	
 	@property 
 	def password(self):
 		'''
@@ -34,19 +35,16 @@ class User(UserMixin, db.Model):
 
 
 	def verify_password(self, password):
-		'''
-		'''
+		"""
+		function verifies the password
+		"""
 		return check_password_hash(self.password_hash, password)
 
-	def __init__(self, **kwargs):
-		super(User, self).__init__(**kwargs)
-		if role is None:
-			self.role = Role.query.filter_by(default=True).first()
+	def ping(self):
+		self.last_seen = datetime.utcnow()
+		db.session.add(self)
 
-	def can(self,permissions):
-		return self.role is not None and\
-			(self.role.permissions & permissions) == permissions
-
+	
 class AnonymousUser(AnonymousUserMixin):
 	"""for unregistered user"""
 	def can(self, permissions):
@@ -71,9 +69,7 @@ class AnonymousUser(AnonymousUserMixin):
 	# 	self.confirm = True
 	# 	db.session.add(self)
 	# 	return True
-	def ping(self):
-		self.last_seen = datetime.utcnow()
-		db.session.add(self)
+	
 
 	@login_manager.user_loader
 	def load_user(user_id):
@@ -83,7 +79,7 @@ class AnonymousUser(AnonymousUserMixin):
 		'''
 		return User.query.get(int(user_id))
 
-class  Role(db.Model):
+class Role(db.Model):
 	"""creating roles for the users"""
 	__tablename__ = "roles"
 	id = db.Column(db.Integer, primary_key=True)
@@ -91,6 +87,15 @@ class  Role(db.Model):
 	default = db.Column(db.Boolean, default=False, index=True)
 	permissions = db.Column(db.Integer)
 	users = db.relationship('User', backref='role', lazy='dynamic')
+
+	def __init__(self, **kwargs):
+		super(User, self).__init__(**kwargs)
+		if self.role is None:
+			self.role = Role.query.filter_by(default=True).first()
+
+	def can(self,permissions):
+		return self.role is not None and\
+			(self.role.permissions & permissions) == permissions
 
 	@staticmethod
 	def insert_roles():
