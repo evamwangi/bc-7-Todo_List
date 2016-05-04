@@ -10,6 +10,14 @@
 <div class="container">
     <div class="row">
         <div class="col-md-6">
+
+        	Hello,
+			{% if current_user.is_authenticated %}
+				{{ current_user.username }}
+			{% else %}
+				Stranger
+			{% endif %}!
+
             <div class="todolist not-done">
              <h1>Todos</h1>
                 <input type="text" class="form-control add-todo" placeholder="Add todo">
