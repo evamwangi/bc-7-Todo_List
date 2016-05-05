@@ -4,6 +4,8 @@ from wtforms.validators import Required
 
 
 class TodoForm(Form):
-    todo= TextField('', validators=[Required()])
-    description = TextField('description', validators=[Required()])
-    submit = SubmitField('Add')
+    todos = StringField('todoList', validators=[Required()]) 
+											 
+    description = StringField('description', validators=[Required()])
+    
+    submit = SubmitField('submit')

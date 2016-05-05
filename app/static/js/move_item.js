@@ -3,7 +3,6 @@ $("#sortable").disableSelection();
 $(document).ready(function() {
 
     countTodos();
-    console.log("all done")
 
     // all done btn
     $("#checkAll").on('click', function(){

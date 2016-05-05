@@ -1,6 +1,7 @@
 from datetime import datetime
 from flask import render_template, session, redirect, url_for
 from flask.ext.login import login_required
+from flask.ext.login import current_user
 from . import main
 from .. import db
 from..models import User, Todo
@@ -12,15 +13,16 @@ def index():
 	return render_template('index.html')
 
 @main.route('/todo', methods=['GET', 'POST'])
-
 @login_required
 def todo():
 	form = TodoForm()
-	Todo(todolists= form.todo.data, description=form.description.data)
-	if todo is not None :
-			return redirect(url_for('main.todo'))
-			flash('added to the list.')
-	return render_template('todolists.html')
+	if form.validate_on_submit():
+		todo_list = Todo(todos=form.todos.data, description=form.description.data, author=current_user._get_current_object())
+		# flash('added to the list.')
+		db.session.add(todo_list)
+		db.session.commit()
+	todo = Todo.query.all()
+	return render_template('todolists.html', form=form, todo=todo)
 
 @main.route('/user/<username>')
 def user(username):

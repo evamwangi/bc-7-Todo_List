@@ -13,12 +13,7 @@ class User(UserMixin, db.Model):
 	username = db.Column(db.String(64), unique=True, index=True)
 	email = db.Column(db.String(64), unique=True, index=True)
 	password_hash = db.Column(db.String(128))
-	role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
-	name = db.Column(db.String(64))
-	location = db.Column(db.String(64))
-	about_me = db.Column(db.Text())
-	member_since = db.Column(db.DateTime(), default=datetime.utcnow)
-	last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
+	todos = db.relationship('Todo', backref='author', lazy='dynamic')
 
 	
 	@property 
@@ -40,16 +35,24 @@ class User(UserMixin, db.Model):
 		"""
 		return check_password_hash(self.password_hash, password)
 
-	def ping(self):
-		self.last_seen = datetime.utcnow()
-		db.session.add(self)
+	# def __init__(self, username, email):
+	# 	self.username = username
+	#  	self.email = email
 
-class Todo():
+	#  def __repr__(self):
+	# 	return '<User %r>' self.username
+
+
+class Todo(db.Model):
 	__tablename__ = 'todo_list'
 
 	id = db.Column(db.Integer, primary_key=True)
-	todo = db.Column(db.String(64), index=True)
+	todos = db.Column(db.String(64), index=True)
 	description = db.Column(db.String(64), index=True)
+	timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+	# member_since = db.Column(db.DateTime(), default=datetime.utcnow)
+	# last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
+	author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 
 	
@@ -62,3 +65,4 @@ class Todo():
 		'''
 		return User.query.get(int(user_id))
 
+		
