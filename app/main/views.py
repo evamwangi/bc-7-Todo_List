@@ -19,7 +19,7 @@ def todo():
 	Todo(todolists= form.todo.data, description=form.description.data)
 	if todo is not None :
 			return redirect(url_for('main.todo'))
-		flash('added to the list.')
+			flash('added to the list.')
 	return render_template('todolists.html')
 
 @main.route('/user/<username>')

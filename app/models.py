@@ -44,31 +44,14 @@ class User(UserMixin, db.Model):
 		self.last_seen = datetime.utcnow()
 		db.session.add(self)
 
-	
-class AnonymousUser(AnonymousUserMixin):
-	"""for unregistered user"""
-	def can(self, permissions):
-		return False
-# login_manager.anonymous_user = AnonymousUser
-		
-		
+class Todo():
+	__tablename__ = 'todo_list'
 
-	# def generate_confirmation_token(self, expiration=3600):
-	# 	s = Serializer(current_app.config['SECRET_KEY'], expiration)
-	# 	return s.dumps({'confirm': self.id})
+	id = db.Column(db.Integer, primary_key=True)
+	todo = db.Column(db.String(64), index=True)
+	description = db.Column(db.String(64), index=True)
 
-	# def confirm(self, token):
-	# 	s = Serializer(current_app.config['SECRET_KEY'])
-	# 	try:
-	# 		s.loads(token)
-	# 	except:
-	# 		return False
-	# 	if data.get('confirm') != self.id:
-	# 		return False
 
-	# 	self.confirm = True
-	# 	db.session.add(self)
-	# 	return True
 	
 
 	@login_manager.user_loader
@@ -79,44 +62,3 @@ class AnonymousUser(AnonymousUserMixin):
 		'''
 		return User.query.get(int(user_id))
 
-class Role(db.Model):
-	"""creating roles for the users"""
-	__tablename__ = "roles"
-	id = db.Column(db.Integer, primary_key=True)
-	name = db.Column(db.String(64), unique=True)
-	default = db.Column(db.Boolean, default=False, index=True)
-	permissions = db.Column(db.Integer)
-	users = db.relationship('User', backref='role', lazy='dynamic')
-
-	def __init__(self, **kwargs):
-		super(User, self).__init__(**kwargs)
-		if self.role is None:
-			self.role = Role.query.filter_by(default=True).first()
-
-	def can(self,permissions):
-		return self.role is not None and\
-			(self.role.permissions & permissions) == permissions
-
-	@staticmethod
-	def insert_roles():
-		roles = {
-			'user': (Permission.FOLLOW|
-					Permission.WRITE_ARTICLES|
-					Permission.COMMENT, True)
-		}
-
-		for r in roles:
-			role = Role.query.filter_by(name=r).first()
-			if role is None:
-				role = Role(name=r)
-			role.Permissions = roles[r][0]
-			role.default = roles[r][1]
-			db.session.add(role)
-		db.session.commit()
-		
-
-class Permission:
-	FOLLOW = 0x01
-	COMMENT = 0x02
-	WRITE_ARTICLES = 0x04
-	
