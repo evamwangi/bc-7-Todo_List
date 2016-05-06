@@ -49,9 +49,13 @@
              <h1>Already Done</h1>
                 <ul id="done-items" class="list-unstyled">
                 {% for donetodos in done %}
-                <div >{{ donetodos.timestamp}}</div>
+                <li>
+                <div class="undotask" >{{ donetodos.timestamp}}</div>
                 <div >{{ donetodos.todos}}</div>
                 <div >{{ donetodos.description}}</div>
+                <button class="remove-item btn btn-default btn-xs pull-right" id="undotask"><span class="glyphicon glyphicon-remove"></span></button>
+                <button class="remove-item btn btn-default btn-xs pull-right"><span class="glyphicon glyphicon-ok"></span></button>
+                </li>
                 {%endfor%}
                     <li>Some item <button class="remove-item btn btn-default btn-xs pull-right"><span class="glyphicon glyphicon-remove"></span></button></li>
                 

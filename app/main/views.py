@@ -22,6 +22,7 @@ def todo():
 		# flash('added to the list.')
 		db.session.add(todo_list)
 		db.session.commit()
+		return redirect(url_for('main.todo'))
 	todo = Todo.query.filter_by(done=False).all()
 	done = Todo.query.filter_by(done=True).all()
 	return render_template('todolists.html', db=db, form=form, todo=todo, done=done)
@@ -35,14 +36,26 @@ def delete():
 	todo.done = True
 	db.session.add(todo)
 	db.session.commit()
-	flash ('marked')
+	# flash ('marked')
 	todos = Todo.query.filter_by(done=True).all()
 	todos = [{'todos': todo.todos, 'description': todo.description, 'timestamp': todo.timestamp} for todo in todos]
 
 	return jsonify(**{'todos': todos})
-	# except Exception, e:
-		# return jsonify(**{'message': 'there was an error deleting the todo'})
+	
 
+@main.route('/undo', methods=['GET', 'POST'])
+def undo():
+	data = request.get_json()
+	timestamp = data['timestamp']
+	todo = Todo.query.filter_by(timestamp=timestamp).first()	
+	todo.done = False
+	db.session.add(todo)
+	db.session.commit()
+	# flash ('marked')
+	todos = Todo.query.filter_by(done=False).all()
+	todos = [{'todos': todo.todos, 'description': todo.description, 'timestamp': todo.timestamp} for todo in todos]
+
+	return jsonify(**{'todos': todos})
 
 @main.route('/user/<username>')
 def user(username):

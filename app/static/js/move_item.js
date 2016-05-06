@@ -34,15 +34,31 @@ $(document).ready(function() {
     });
 
     //delete done task from "already done"
-    $('.todolist').on('click','.remove-item',function(){    
+    $('.todolist').on('click','.remove-item',function(){
+        console.log('clicked!!!'); 
+
         removeItem(this);
+          if ($('#undotask').on('click')) {
+            var timestamp = $('.undotask').html();
+            $.ajax({
+                url: '/undo',
+                type: 'POST',
+                data: JSON.stringify({
+                    "timestamp": timestamp  
+                }, null, '\t'),
+                contentType: 'application/json;charset=UTF-8',
+                success: function(result) {
+                    console.log(result);
+                    window.location.reload();
+                }
+            });
+        }
     });
 
        $('input[type=checkbox]').change(function(){
         // var timestamp = $('#todoTime').text
         if ($('#todoCheck').is(':checked')) {
             var timestamp = $('.todoTime').html();
-            var request = window.superagent;
             $.ajax({
                 url: '/delete',
                 type: 'POST',
@@ -52,6 +68,7 @@ $(document).ready(function() {
                 contentType: 'application/json;charset=UTF-8',
                 success: function(result) {
                     console.log(result);
+                    window.location.reload();
                 }
             })
            // console.log('timestamp: ', $('#todoTime').text());      
@@ -100,5 +117,5 @@ $(document).ready(function() {
     //remove done task from list
     function removeItem(element){
         $(element).parent().remove();
-}
-})
+    }
+});
