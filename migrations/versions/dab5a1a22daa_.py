@@ -1,13 +1,13 @@
 """empty message
 
-Revision ID: 2a4565d3de0a
+Revision ID: dab5a1a22daa
 Revises: None
-Create Date: 2016-05-05 19:15:34.073000
+Create Date: 2016-05-06 11:15:54.327000
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '2a4565d3de0a'
+revision = 'dab5a1a22daa'
 down_revision = None
 
 from alembic import op
@@ -37,7 +37,7 @@ def upgrade():
     )
     op.create_index(op.f('ix_todo_list_description'), 'todo_list', ['description'], unique=False)
     op.create_index(op.f('ix_todo_list_timestamp'), 'todo_list', ['timestamp'], unique=False)
-    op.create_index(op.f('ix_todo_list_todos'), 'todo_list', ['todos'], unique=False)
+    op.create_index(op.f('ix_todo_list_todos'), 'todo_list', ['todos'], unique=True)
     ### end Alembic commands ###
 
 

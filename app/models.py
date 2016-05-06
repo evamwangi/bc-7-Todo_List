@@ -35,27 +35,18 @@ class User(UserMixin, db.Model):
 		"""
 		return check_password_hash(self.password_hash, password)
 
-	# def __init__(self, username, email):
-	# 	self.username = username
-	#  	self.email = email
-
-	#  def __repr__(self):
-	# 	return '<User %r>' self.username
-
 
 class Todo(db.Model):
 	__tablename__ = 'todo_list'
 
 	id = db.Column(db.Integer, primary_key=True)
-	todos = db.Column(db.String(64), index=True)
+	todos = db.Column(db.String(64), index=True, unique=True)
 	description = db.Column(db.String(64), index=True)
 	timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 	done = db.Column(db.Boolean(), default=False)
 	author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-
 	
-
 	@login_manager.user_loader
 	def load_user(user_id):
 		'''	
@@ -63,5 +54,3 @@ class Todo(db.Model):
 			It loads a user, given the identifier.
 		'''
 		return User.query.get(int(user_id))
-
-		

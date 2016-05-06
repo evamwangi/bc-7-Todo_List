@@ -60,7 +60,7 @@ $(document).ready(function() {
         if ($('#todoCheck').is(':checked')) {
             var timestamp = $('.todoTime').html();
             $.ajax({
-                url: '/delete',
+                url: '/donetodos',
                 type: 'POST',
                 data: JSON.stringify({
                     "timestamp": timestamp  
