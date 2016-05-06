@@ -34,8 +34,28 @@ $(document).ready(function() {
     });
 
     //delete done task from "already done"
-    $('.todolist').on('click','.remove-item',function(){
+    $('.todolist').on('click','.remove-item',function(){    
         removeItem(this);
+    });
+
+       $('input[type=checkbox]').change(function(){
+        // var timestamp = $('#todoTime').text
+        if ($('#todoCheck').is(':checked')) {
+            var timestamp = $('.todoTime').html();
+            var request = window.superagent;
+            $.ajax({
+                url: '/delete',
+                type: 'POST',
+                data: JSON.stringify({
+                    "timestamp": timestamp  
+                }, null, '\t'),
+                contentType: 'application/json;charset=UTF-8',
+                success: function(result) {
+                    console.log(result);
+                }
+            })
+           // console.log('timestamp: ', $('#todoTime').text());      
+        }
     });
 
     // count tasks

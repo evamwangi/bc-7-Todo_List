@@ -6,6 +6,7 @@
 <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>	
 <script type="text/javascript" src="{{ url_for('static', filename='js/move_item.js') }}"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/superagent/1.2.0/superagent.js"></script>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style2.css') }}" />
 <div class="container">
     <div class="row">
@@ -15,17 +16,49 @@
 			
 				{{ current_user.username }}
 			
-            
-             {{wtf.quick_form(form)}}  
+        <div class = "todolist not-done">   
+             {{wtf.quick_form(form)}} 
+
+        
 
         {% for post in todo %}
-            
-             <a href="{{ url_for('.user', username=post.author.username) }}">
-             {{ post.author.username }}
-             <div class="post-body">{{ post.todos}}</div>
-             <div class="post-body">{{ post.description}}</div>
+        <ul id="sortable" class="list-unstyled">
+        <li class="ui-state-default">
+            <div class="checkbox">
+            <label>
+                    <input type="checkbox" value="" id="todoCheck"/>
+             <!-- <a href="{{ url_for('.user', username=post.author.username) }}">
+             {{ post.author.username }}</a> -->
+             <div id="todoTime" class="form-control add-todo todoTime">{{ post.timestamp}}</div>
+             <div class="form-control add-todo">{{ post.todos}}</div>
+             <div class="form-control add-todo">{{ post.description}}</div>
+                </label>
+                </div>
+        </li>
+        </ul>
         {%endfor%}
-
+         
+         <div class="todo-footer">
+                    <strong><span class="count-todos"></span></strong> Items Left
+                </div>       
+            
+    </div> 
     </div>
+    <div class="col-md-6">
+            <div class="todolist">
+             <h1>Already Done</h1>
+                <ul id="done-items" class="list-unstyled">
+                {% for donetodos in done %}
+                <div >{{ donetodos.timestamp}}</div>
+                <div >{{ donetodos.todos}}</div>
+                <div >{{ donetodos.description}}</div>
+                {%endfor%}
+                    <li>Some item <button class="remove-item btn btn-default btn-xs pull-right"><span class="glyphicon glyphicon-remove"></span></button></li>
+                
+                    
+                </ul>
+            </div>
+        </div>
+</div>
 </div>
 {% endblock %}

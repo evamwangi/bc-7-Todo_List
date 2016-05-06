@@ -50,8 +50,7 @@ class Todo(db.Model):
 	todos = db.Column(db.String(64), index=True)
 	description = db.Column(db.String(64), index=True)
 	timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-	# member_since = db.Column(db.DateTime(), default=datetime.utcnow)
-	# last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
+	done = db.Column(db.Boolean(), default=False)
 	author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 
